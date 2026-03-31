@@ -1,0 +1,5 @@
+[project]
+name = "DKS"
+version = "0.0.1"
+description = "Da KeypunchAr's Scheduler: A personalized scheduler to handle and allocate time for various tasks"
+dependencies = ["flask"]
