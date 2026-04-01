@@ -76,6 +76,7 @@ def register():
                 # commit to fail. Show a validation error.
                 error = f"Email {email} is already registered."
                 flash(error)
+                return redirect(url_for("auth.login"))
             else:
                 return redirect(url_for("auth.login"))
 
