@@ -1,0 +1,17 @@
+{% extends 'base.html' %} {% block title %} {{ username }}'s Task List - DKS {%
+endblock %} {% block content %}
+<h1>{{ username }}'s Task List - DKS</h1>
+
+{% if tasks|length == 0 %}
+<p>
+  You have no tasks to do stuff. Add a task
+  <a href="{{ url_for('add_task') }}">here</a>.
+</p>
+{% else %} {% for task in tasks %}
+<div class="task">
+  <p>
+    Task Name: {{ task['name'] }}<br /><br />
+    Task Description: {{ task['description'] }}
+  </p>
+</div>
+{% endfor %} {% endif %} {% endblock %}

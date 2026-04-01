@@ -1,0 +1,17 @@
+{% extends 'base.html' %} {% block title %} Log In - DKS {% endblock %} {% block
+content %}
+<h1>Log In</h1>
+<form method="post">
+  <label for="email">Email</label>
+  <input name="email" id="email" required />
+  <br /><br />
+  <label for="password">Password</label>
+  <input type="password" name="password" id="password" required />
+  <br /><br />
+  <input type="submit" value="Log In" />
+</form>
+<br><br>
+<p>
+  Don't have an account? Register <a href={{ url_for('auth.register') }}>here</a>.
+</p>
+{% endblock %}
