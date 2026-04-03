@@ -1,0 +1,18 @@
+{% extends 'base.html' %} {% block title %} Add Task - DKS {% endblock %} {%
+block content %}
+<h1>Add Task</h1>
+
+<form method="post">
+  <label for="title">Title</label>
+  <input name="title" id="title" required/>
+  <br /><br />
+  <label for="description">Description</label>
+  <textarea name="description" id="description"></textarea>
+  <br /><br />
+  <label for="priority">Priority</label>
+  <input type="priority" name="priority" id="priority"/>
+  <br /><br />
+  <input type="submit" value="Add task" />
+</form>
+
+{% endblock %}

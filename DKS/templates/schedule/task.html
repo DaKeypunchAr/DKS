@@ -1,0 +1,31 @@
+{% extends 'base.html' %} {% block title %} {{ task['title'] }} - DKS {%
+endblock %} {% block content %}
+<h1>{{ task['title'] }}</h1>
+
+<div class="task">
+  <p>
+  {% if task['description'] %}
+    Task Description: {{ task['description'] }}
+  {% endif %}
+  <br>
+  <a href='{{ url_for('schedule.remove_task') }}?tid={{ task['id'] }}'>
+    Remove task
+  </a>
+  <br>
+  <a href='{{ url_for('schedule.edit_task') }}?tid={{ task['id'] }}'>
+    Edit task
+  </a>
+  <br>
+  <a href='{{ url_for('schedule.toggle_task_completion') }}?tid={{ task['id'] }}'>
+    {% if task['completed'] %}
+      Mark it as incomplete
+    {% else %}
+      Mark it as complete
+    {% endif %}
+  </a>
+  </p>
+
+
+</div>
+
+{% endblock %}

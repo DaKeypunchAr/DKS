@@ -3,6 +3,7 @@ from flask import Flask
 from flask import render_template
 from flask import session
 from flask import redirect
+from flask import request
 from flask import url_for
 
 def create_app(test_config=None):
@@ -27,27 +28,11 @@ def create_app(test_config=None):
     from . import auth
     app.register_blueprint(auth.bp)
 
+    from . import scheduler
+    app.register_blueprint(scheduler.bp)
+
     @app.route('/')
     def index():
-        if 'user_id' not in session:
-            return redirect(url_for('auth.login'))
-
-        user_id = session['user_id']
-
-        from .db import get_db
-        db = get_db()
-        user = db.execute('SELECT * FROM user WHERE id = ?',
-                          (user_id,)).fetchone()
-
-        if user is None:
-            session.clear()
-            return redirect(url_for('auth.login'))
-
-        name = user['username']
-        return render_template('index.html', username = name, tasks = [])
-
-    @app.route('/add_task')
-    def add_task():
-        return render_template('add_task.html')
+        return redirect(url_for('schedule.index'))
 
     return app

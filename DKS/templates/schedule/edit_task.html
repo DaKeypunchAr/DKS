@@ -1,0 +1,18 @@
+{% extends 'base.html' %} {% block title %} Edit Task - DKS {% endblock %} {%
+block content %}
+<h1>Edit Task</h1>
+
+<form method="post">
+  <label for="title">Title</label>
+  <input name="title" id="title" value="{{ task['title'] }}" required/>
+  <br /><br />
+  <label for="description">Description</label>
+  <textarea name="description" id="description">{{ task['description'] }}</textarea>
+  <br /><br />
+  <label for="priority">Priority</label>
+  <input type="priority" name="priority" id="priority" value="{{ task['priority'] }}"/>
+  <br /><br />
+  <input type="submit" value="Finish changes" />
+</form>
+
+{% endblock %}
