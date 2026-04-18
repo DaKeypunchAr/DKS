@@ -21,10 +21,18 @@ def login_required(view):
 
     @functools.wraps(view)
     def wrapped_view(**kwargs):
-        if g.user is None:
+        if 'user_id' not in session:
             return redirect(url_for("auth.login"))
 
-        return view(**kwargs)
+        db = get_db()
+        user = db.execute('SELECT * FROM user WHERE id = ?',
+                          (session['user_id'],)).fetchone()
+
+        if user is None:
+            session.clear()
+            return redirect(url_for("auth.login"))
+
+        return view(user, **kwargs)
 
     return wrapped_view
 

@@ -6,31 +6,24 @@ from flask import url_for
 from flask import request
 
 from .db import get_db
+from .auth import login_required
+
+from datetime import datetime
+
 bp = Blueprint("schedule", __name__, url_prefix="/schedule")
 
 @bp.route('/')
-def index():
-    if 'user_id' not in session:
-        return redirect(url_for('auth.login'))
-
-    user_id = session['user_id']
-
-    from .db import get_db
-    db = get_db()
-    user = db.execute('SELECT * FROM user WHERE id = ?',
-                        (user_id,)).fetchone()
-
-    if user is None:
-        session.clear()
-        return redirect(url_for('auth.login'))
-
-    name = user['username']
-    task_list = db.execute('SELECT * FROM task WHERE user_id = ?',
-                           (user_id,)).fetchall()
-    return render_template('schedule/index.html', username = name, tasks = task_list)
+@login_required
+def index(user):
+    unfinished_task_list = get_db().execute('SELECT * FROM task WHERE user_id = ? AND completed = 0 ORDER BY priority DESC',
+                           (user['id'],)).fetchall()
+    finished_task_list = get_db().execute('SELECT * FROM task WHERE user_id = ? AND completed = 1 ORDER BY completion_time DESC',
+                                          (user['id'],)).fetchall()
+    return render_template('schedule/index.html', username = user['username'], unfinished_tasks = unfinished_task_list, finished_tasks = finished_task_list)
 
 @bp.route('/add_task', methods=('GET', 'POST'))
-def add_task():
+@login_required
+def add_task(user):
     if request.method == 'GET':
         return render_template('schedule/add_task.html')
 
@@ -52,14 +45,15 @@ def add_task():
 
     if error is None:
         db = get_db()
-        db.execute('INSERT INTO task (title, description, priority, user_id) VALUES (?, ?, ?, ?)', (task_title, description, priority, session['user_id']))
+        db.execute('INSERT INTO task (title, description, priority, user_id) VALUES (?, ?, ?, ?)', (task_title, description, priority, user['id']))
         db.commit()
         return redirect(url_for('schedule.index'))
 
     return redirect(url_for('schedule.add_task'))
 
 @bp.route('/task', methods=('GET', 'POST'))
-def task_details():
+@login_required
+def task_details(user):
     tid = request.args.get('tid')
     if tid is None:
         return redirect(url_for('schedule.index'))
@@ -69,7 +63,8 @@ def task_details():
     return render_template('schedule/task.html', task=task)
 
 @bp.get('/remove_task')
-def remove_task():
+@login_required
+def remove_task(user):
     tid = request.args.get('tid')
     if tid is None:
         return redirect(url_for('schedule.index'))
@@ -80,7 +75,8 @@ def remove_task():
     return redirect(url_for('schedule.index'))
 
 @bp.route('/edit_task', methods=('GET', 'POST'))
-def edit_task():
+@login_required
+def edit_task(user):
     tid = request.args.get('tid')
     if tid is None:
         return redirect(url_for('schedule.index'))
@@ -116,7 +112,8 @@ def edit_task():
 
 
 @bp.get('/toggle_task_completion')
-def toggle_task_completion():
+@login_required
+def toggle_task_completion(user):
     tid = request.args.get('tid')
     if tid is None:
         return redirect(url_for('schedule.index'))
@@ -124,8 +121,9 @@ def toggle_task_completion():
     db = get_db()
     completed = db.execute('SELECT * FROM task WHERE id = ?',
                            (tid,)).fetchone()['completed']
-    print(completed)
-    db.execute('UPDATE task SET completed = ? WHERE id = ?', (1 if
-        completed == 0 else 0, tid))
+
+    completed = 1 if completed == 0 else 0
+    db.execute('UPDATE task SET completed = ?, completion_time = ? WHERE id = ?', (completed, datetime.now() if completed else None, tid))
+
     db.commit()
     return redirect(url_for('schedule.task_details', tid=tid))

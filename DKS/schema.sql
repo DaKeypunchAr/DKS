@@ -16,5 +16,6 @@ CREATE TABLE task (
   description TEXT NOT NULL,
   priority INTEGER NOT NULL DEFAULT 10,
   completed INTEGER NOT NULL DEFAULT 0,
+  completion_time TIMESTAMP DEFAULT NULL,
   FOREIGN KEY (user_id) REFERENCES user (id)
 );
